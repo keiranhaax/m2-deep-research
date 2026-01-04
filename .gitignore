@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+dist/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Environment
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Database
+*.db
+*.db-wal
+*.db-shm
