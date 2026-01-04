@@ -1,5 +1,5 @@
 // src/app/App.tsx
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Box } from 'ink';
 import { detectColorTier, detectUnicodeSupport } from '../ui/terminalCaps';
 import { createTheme } from '../ui/theme';
@@ -8,8 +8,8 @@ import { Header } from '../components/header/Header';
 import { MessageList } from '../components/messages/MessageList';
 import { ActiveStep } from '../components/footer/ActiveStep';
 import { FooterInput } from '../components/footer/FooterInput';
-import { useResearchStream } from './useResearchStream';
 import { useKeyboardNavigation } from './useKeyboardNavigation';
+import { PythonClient } from '../protocol/client';
 import type { Message } from './state';
 
 export function App() {
@@ -19,34 +19,20 @@ export function App() {
 
   const [mode, setMode] = useState<'chat' | 'plan' | 'research'>('chat');
   const [requestStatus, setRequestStatus] = useState<'idle' | 'streaming' | 'aborted' | 'error'>('idle');
-  const [activeStep, setActiveStep] = useState('Idle');
+  const [activeStep, setActiveStep] = useState('Initializing...');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [client] = useState(() => new PythonClient());
+
+  useEffect(() => {
+    client.spawn().then(() => {
+      setActiveStep('Ready');
+    });
+    return () => client.kill();
+  }, [client]);
 
   const addMessage = useCallback((message: Message) => {
     setMessages(prev => [...prev, message]);
   }, []);
-
-  const updateMessage = useCallback((id: string, updates: Partial<Message>) => {
-    setMessages(prev => prev.map(msg =>
-      msg.id === id ? { ...msg, ...updates } : msg
-    ));
-  }, []);
-
-  const clearMessages = useCallback(() => {
-    setMessages([]);
-  }, []);
-
-  useResearchStream({
-    state: { mode, requestStatus, activeStep, messages, showRightPanel: false, rightPanelContent: 'plan' },
-    actions: { setMode, setRequestStatus, setActiveStep, addMessage, updateMessage, clearMessages },
-    eventSource: null,
-  });
-
-  useKeyboardNavigation({
-    mode,
-    onModeChange: setMode,
-    onAbort: () => setRequestStatus('aborted'),
-  });
 
   const handleSubmit = useCallback((text: string) => {
     addMessage({
@@ -55,7 +41,22 @@ export function App() {
       content: text,
       timestamp: Date.now(),
     });
-  }, [addMessage]);
+
+    client.send({
+      type: mode,
+      content: text,
+      requestId: crypto.randomUUID(),
+    });
+  }, [addMessage, client, mode]);
+
+  useKeyboardNavigation({
+    mode,
+    onModeChange: setMode,
+    onAbort: () => {
+      setRequestStatus('aborted');
+      client.send({ type: 'abort' });
+    },
+  });
 
   return (
     <Frame theme={theme} showFooter={false}>
