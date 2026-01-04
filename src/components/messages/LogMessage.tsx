@@ -1,5 +1,5 @@
 // src/components/messages/LogMessage.tsx
-import React from 'react';
+
 import { Box, Text } from 'ink';
 import type { Message } from '../../app/state';
 import type { Theme } from '../../ui/theme';

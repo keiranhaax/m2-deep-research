@@ -1,5 +1,5 @@
 // src/components/header/StatusPill.tsx
-import React from 'react';
+
 import { Box, Text } from 'ink';
 import type { Theme } from '../../ui/theme';
 

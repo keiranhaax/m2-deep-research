@@ -1,5 +1,5 @@
 // src/app/App.tsx
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Box } from 'ink';
 import { detectColorTier, detectUnicodeSupport } from '../ui/terminalCaps';
 import { createTheme } from '../ui/theme';

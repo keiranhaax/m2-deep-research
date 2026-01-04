@@ -1,5 +1,5 @@
 // src/components/footer/ActiveStep.tsx
-import React from 'react';
+
 import { Text } from 'ink';
 import type { Theme } from '../../ui/theme';
 

@@ -1,5 +1,5 @@
 // src/components/messages/MessageList.tsx
-import React from 'react';
+
 import { Box } from 'ink';
 import type { Theme } from '../../ui/theme';
 import type { Message } from '../../app/state';
